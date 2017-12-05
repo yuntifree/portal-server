@@ -1,0 +1,56 @@
+syntax = "proto3";
+
+package go.micro.srv.verify;
+
+service Verify {
+    rpc GetCheckCode(CodeRequest) returns (CodeResponse){}
+    rpc CheckLogin(CheckRequest) returns (CheckResponse){}
+    rpc PortalLogin(PortalLoginRequest) returns (LoginResponse) {}
+}
+message PortalLoginRequest {
+    string phone = 1;
+    string code = 2;
+    string wlanacname = 3;
+    string wlanuserip = 4;
+    string wlanacip = 5;
+    string wlanusermac = 6;
+    string wlanapmac = 7;
+}
+
+message LoginResponse {
+    int64 uid = 1;
+    string token = 2;
+    string portaldir = 3;
+    int64 portaltype = 4;
+    int64 adtype = 5;
+    string cover = 6;
+    string dst = 7;
+}
+
+message CodeRequest {
+    string phone = 1;
+    string wlanacname = 2;
+    string wlanapmac = 3;
+}
+
+message CodeResponse {
+}
+
+message CheckRequest {
+    string wlanusermac = 1;
+    string wlanacname = 2;
+    string wlanapmac = 3;
+}
+
+message CheckResponse {
+    int64 autologin = 1;
+    string img = 2;
+    string wxappid = 3;
+    string wxsecret = 4;
+    string wxshopid = 5;
+    string wxauthurl = 6;
+    int64  taobao = 7;
+    int64 logintype = 8;
+    string dst = 9;
+    string cover = 10;
+}
