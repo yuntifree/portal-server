@@ -8,7 +8,7 @@ function install_server()
     killall $1
     ulimit -c unlimited
     cd $SRV_DST
-    sudo nohup $SRV_DST/$1 >> $SRV_DST/$1.log 2>&1 &
+    nohup $SRV_DST/$1 >> $SRV_DST/$1.log 2>&1 &
     cd -
 }
 

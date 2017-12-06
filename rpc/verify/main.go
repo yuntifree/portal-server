@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"math/rand"
+	"net"
 	"time"
 
 	_ "github.com/go-sql-driver/mysql"
@@ -13,19 +14,22 @@ import (
 	"github.com/yuntifree/components/dbutil"
 	"github.com/yuntifree/components/sms"
 	"github.com/yuntifree/portal-server/accounts"
+	"github.com/yuntifree/portal-server/conn"
 	verify "github.com/yuntifree/portal-server/proto/verify"
 	context "golang.org/x/net/context"
 )
 
 const (
-	adImg     = "http://192.168.18.252/static/img/115cebf5-2ad3-458f-bc2c-48c667eacd52.png"
-	wxAppid   = "wx0898ab51f688ee64"
-	wxSecret  = "bf430af449b70efc04f11964bc5968a3"
-	wxShopid  = "3535655"
-	wxAuthURL = "http://wx.yunxingzh.com/auth"
-	portalDir = "http://api.yunxingzh.com/portal0406201704201946/index0406.html"
-	tstUID    = 137
-	tstToken  = "6ba9ac5a422d4473b337d57376dd3488"
+	adImg       = "http://192.168.18.252:8080/static/img/115cebf5-2ad3-458f-bc2c-48c667eacd52.png"
+	wxAppid     = "wx0898ab51f688ee64"
+	wxSecret    = "bf430af449b70efc04f11964bc5968a3"
+	wxShopid    = "3535655"
+	wxAuthURL   = "http://wx.yunxingzh.com/auth"
+	portalDir   = "http://api.yunxingzh.com/portal0406201704201946/index0406.html"
+	tstUID      = 137
+	tstToken    = "6ba9ac5a422d4473b337d57376dd3488"
+	tstUsername = "test"
+	tstPasswd   = "test"
 )
 
 var db *sql.DB
@@ -122,11 +126,30 @@ func isAutoMac(db *sql.DB, usermac, apmac string) int64 {
 	return 1
 }
 
+func challenge(userip, username, passwd string) error {
+	ip := net.ParseIP(accounts.Acip)
+	c := conn.Conn{Acip: ip,
+		Acport:   accounts.Acport,
+		ShareKey: accounts.ShareKey,
+		Timeout:  accounts.Timeout}
+	uip := net.ParseIP(userip)
+	id, cha, err := c.Challenge(uip)
+	if err != nil {
+		return err
+	}
+	log.Printf("id:%d cha:%+v", id, cha)
+	err = c.Auth(uip, []byte(username), []byte(passwd), cha, id)
+	return err
+}
+
 //PortalLogin portal login
 func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest,
 	rsp *verify.LoginResponse) error {
 	if !checkPhoneCode(db, req.Phone, req.Code) {
 		return errors.New("illegal phone code")
+	}
+	if err := challenge(req.Wlanuserip, tstUsername, tstPasswd); err != nil {
+		return errors.New("challenge failed:" + err.Error())
 	}
 	if err := createUser(db, req.Phone, req.Wlanusermac); err != nil {
 		return errors.New("create user failed:" + err.Error())
@@ -178,11 +201,13 @@ func createUser(db *sql.DB, phone, usermac string) error {
 	if err != nil {
 		return err
 	}
-	_, err = db.Exec(`INSERT IGNORE INTO users(username, phone, ctime) VALUES 
-	(?,?, NOW())`, phone, phone)
-	if err != nil {
-		return err
-	}
+	/*
+		_, err = db.Exec(`INSERT IGNORE INTO users(username, phone, ctime) VALUES
+		(?,?, NOW())`, phone, phone)
+		if err != nil {
+			return err
+		}
+	*/
 	return nil
 }
 

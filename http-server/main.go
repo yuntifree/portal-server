@@ -13,5 +13,5 @@ func main() {
 	r.GET("/get_check_code", getCodeHandler)
 	r.GET("/portal_login", portalLoginHandler)
 	r.Static("/static/", "/home/darren/html")
-	r.Run(":80")
+	r.Run(":8080")
 }

@@ -9,9 +9,8 @@ import (
 )
 
 const (
-	curVersion = 0x02
-	_          = iota
-	ReqChallenge
+	curVersion   = 0x02
+	ReqChallenge = iota
 	AckChallenge
 	ReqAuth
 	AckAuth

@@ -70,11 +70,6 @@ func NewAuth(userip net.IP, secret string, username []byte, userpwd []byte,
 //NewReqInfo generate reqinfo message
 func NewReqInfo(userip net.IP, secret string) *Message {
 	msg := newMessage(ReqInfo, userip, newSerialNo(), 0)
-	msg.Head.AttrNum = 2
-	msg.Attrs = []Attr{
-		{Type: byte(6), Len: 0},
-		{Type: byte(7), Len: 0},
-	}
 	msg.AuthBy(secret)
 	return msg
 }
@@ -110,7 +105,7 @@ func Unmarshal(bts []byte) *Message {
 	binary.Read(buf, binary.BigEndian, &auth)
 	msg.Head.Authenticator = auth[:]
 	msg.Attrs = make([]Attr, msg.Head.AttrNum)
-	for i := byte(0); i > msg.Head.AttrNum; i++ {
+	for i := byte(0); i < msg.Head.AttrNum; i++ {
 		attr := &msg.Attrs[i]
 		binary.Read(buf, binary.BigEndian, &attr.Type)
 		binary.Read(buf, binary.BigEndian, &attr.Len)
