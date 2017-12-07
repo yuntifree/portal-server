@@ -163,6 +163,28 @@ func (s *Server) PortalLogin(ctx context.Context, req *verify.PortalLoginRequest
 	return nil
 }
 
+//OneClickLogin one click login
+func (s *Server) OneClickLogin(ctx context.Context, req *verify.OneClickRequest,
+	rsp *verify.LoginResponse) error {
+	var phone string
+	err := db.QueryRow(`SELECT phone FROM user_mac WHERE mac = ?`, req.Wlanusermac).
+		Scan(&phone)
+	if err != nil {
+		log.Printf("OneClickLogin query phone failed:%v", err)
+		return err
+	}
+	if err := challenge(req.Wlanuserip, tstUsername, tstPasswd); err != nil {
+		return errors.New("challenge failed:" + err.Error())
+	}
+	addOnlineRecord(db, phone, req.Wlanacname, req.Wlanacip, req.Wlanusermac,
+		req.Wlanuserip, req.Wlanapmac)
+	rsp.Uid = tstUID
+	rsp.Token = tstToken
+	rsp.Portaldir = portalDir
+	rsp.Portaltype = 1
+	return nil
+}
+
 func genOnlineTable() string {
 	now := time.Now()
 	return fmt.Sprintf("online_record_%04d%02d", now.Year(), now.Month())

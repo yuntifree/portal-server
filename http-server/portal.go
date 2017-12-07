@@ -79,6 +79,26 @@ func portalLoginHandler(c *gin.Context) {
 		"cover": rsp.Cover, "dst": rsp.Dst}})
 }
 
+func oneClickLoginHandler(c *gin.Context) {
+	var req verify.OneClickRequest
+	req.Wlanacname = c.Query("wlanacname")
+	req.Wlanuserip = c.Query("wlanuserip")
+	req.Wlanacip = c.Query("wlanacip")
+	req.Wlanapmac = c.Query("wlanapmac")
+	req.Wlanusermac = c.Query("wlanusermac")
+	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	rsp, err := cl.OneClickLogin(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"errno": 0, "data": map[string]interface{}{
+		"uid": rsp.Uid, "token": rsp.Token, "portaldir": rsp.Portaldir,
+		"portaltype": rsp.Portaltype, "adtype": rsp.Adtype,
+		"cover": rsp.Cover, "dst": rsp.Dst}})
+}
+
 func logoutHandler(c *gin.Context) {
 	var req verify.LogoutRequest
 	req.Ip = c.Query("ip")
