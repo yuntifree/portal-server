@@ -215,6 +215,12 @@ func addOnlineRecord(db *sql.DB, phone, acname, acip, usermac, userip, apmac str
 	if err != nil {
 		log.Printf("addOnlineRecord online record failed:%s %v", phone, err)
 	}
+
+	_, err = db.Exec(`INSERT IGNORE INTO online_users(userip, username, usermac, acname,
+	ctime) VALUES (?, ?, ?, ?, NOW())`, userip, phone, usermac, acname)
+	if err != nil {
+		log.Printf("addOnlineRecord online_users record failed:%v", err)
+	}
 }
 
 func createUser(db *sql.DB, phone, usermac string) error {
@@ -223,13 +229,11 @@ func createUser(db *sql.DB, phone, usermac string) error {
 	if err != nil {
 		return err
 	}
-	/*
-		_, err = db.Exec(`INSERT IGNORE INTO users(username, phone, ctime) VALUES
+	_, err = db.Exec(`INSERT IGNORE INTO users(username, phone, ctime) VALUES
 		(?,?, NOW())`, phone, phone)
-		if err != nil {
-			return err
-		}
-	*/
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

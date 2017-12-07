@@ -52,4 +52,17 @@ CREATE TABLE IF NOT EXISTS online_record
     KEY(ctime)
 ) ENGINE = InnoDB;
 
+CREATE TABLE IF NOT EXISTS online_users
+(
+    id      bigint unsigned NOT NULL AUTO_INCREMENT,
+    userip  varchar(32) NOT NULL,
+    acname  varchar(32) NOT NULL DEFAULT '',
+    username    varchar(36) NOT NULL DEFAULT '',
+    usermac     varchar(32) NOT NULL DEFAULT '',
+    ctime       datetime NOT NULL DEFAULT '2017-11-01',
+    PRIMARY KEY(id),
+    UNIQUE KEY(userip),
+    KEY(username),
+    KEY(usermac)
+) ENGINE = InnoDB;
 
