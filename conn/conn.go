@@ -58,3 +58,18 @@ func (c *Conn) Auth(userip net.IP, username, passwd, cha []byte, reqid uint16) e
 	}
 	return nil
 }
+
+//Logout handle logout process
+func (c *Conn) Logout(userip net.IP) error {
+	req := huawei.NewLogout(userip, c.ShareKey)
+	log.Printf("Logout request:+%v", req)
+	msg, err := huawei.SendAndRecv(req, c.Acip, c.Acport, c.ShareKey, c.Timeout)
+	if err != nil {
+		return err
+	}
+	err = msg.CheckFor(*req, c.ShareKey)
+	if err != nil {
+		return err
+	}
+	return nil
+}

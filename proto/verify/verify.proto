@@ -6,7 +6,16 @@ service Verify {
     rpc GetCheckCode(CodeRequest) returns (CodeResponse){}
     rpc CheckLogin(CheckRequest) returns (CheckResponse){}
     rpc PortalLogin(PortalLoginRequest) returns (LoginResponse) {}
+    rpc Logout(LogoutRequest) returns (LogoutResponse) {}
 }
+
+message LogoutRequest {
+    string ip = 1;
+}
+
+message LogoutResponse {
+}
+
 message PortalLoginRequest {
     string phone = 1;
     string code = 2;

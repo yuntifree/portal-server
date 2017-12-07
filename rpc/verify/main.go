@@ -225,6 +225,23 @@ func checkPhoneCode(db *sql.DB, phone, code string) bool {
 	return false
 }
 
+//Logout logout for ip
+func (s *Server) Logout(ctx context.Context, req *verify.LogoutRequest,
+	rsp *verify.LogoutResponse) error {
+	ip := net.ParseIP(accounts.Acip)
+	c := conn.Conn{Acip: ip,
+		Acport:   accounts.Acport,
+		ShareKey: accounts.ShareKey,
+		Timeout:  accounts.Timeout}
+	uip := net.ParseIP(req.Ip)
+	err := c.Logout(uip)
+	if err != nil {
+		log.Printf("logout failed:%+v", err)
+		return err
+	}
+	return nil
+}
+
 func main() {
 	var err error
 	db, err = dbutil.NewDB(accounts.DbDsn)

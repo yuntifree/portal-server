@@ -78,3 +78,15 @@ func portalLoginHandler(c *gin.Context) {
 		"portaltype": rsp.Portaltype, "adtype": rsp.Adtype,
 		"cover": rsp.Cover, "dst": rsp.Dst}})
 }
+
+func logoutHandler(c *gin.Context) {
+	var req verify.LogoutRequest
+	req.Ip = c.Query("ip")
+	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	_, err := cl.Logout(context.Background(), &req)
+	if err != nil {
+		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"errno": 0})
+}
