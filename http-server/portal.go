@@ -7,12 +7,12 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/micro/go-micro/client"
+	"github.com/yuntifree/portal-server/accounts"
 	verify "github.com/yuntifree/portal-server/proto/verify"
 )
 
 const (
-	portalDir  = "/static/login201712041340"
-	verifyName = "go.micro.srv.verify"
+	portalDir = "/static/login201712041340"
 )
 
 func portalHandler(c *gin.Context) {
@@ -30,7 +30,7 @@ func checkLoginHandler(c *gin.Context) {
 	req.Wlanusermac = c.Query("wlanusermac")
 	req.Wlanacname = c.Query("wlanacname")
 	req.Wlanapmac = c.Query("wlanapmac")
-	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	cl := verify.NewVerifyClient(accounts.VerifyService, client.DefaultClient)
 	rsp, err := cl.CheckLogin(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
@@ -49,7 +49,7 @@ func getCodeHandler(c *gin.Context) {
 	req.Phone = c.Query("phone")
 	req.Wlanacname = c.Query("wlanacname")
 	req.Wlanapmac = c.Query("wlanapmac")
-	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	cl := verify.NewVerifyClient(accounts.VerifyService, client.DefaultClient)
 	_, err := cl.GetCheckCode(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
@@ -66,7 +66,7 @@ func portalLoginHandler(c *gin.Context) {
 	req.Wlanacip = c.Query("wlanacip")
 	req.Wlanapmac = c.Query("wlanapmac")
 	req.Wlanusermac = c.Query("wlanusermac")
-	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	cl := verify.NewVerifyClient(accounts.VerifyService, client.DefaultClient)
 	rsp, err := cl.PortalLogin(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
@@ -86,7 +86,7 @@ func oneClickLoginHandler(c *gin.Context) {
 	req.Wlanacip = c.Query("wlanacip")
 	req.Wlanapmac = c.Query("wlanapmac")
 	req.Wlanusermac = c.Query("wlanusermac")
-	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	cl := verify.NewVerifyClient(accounts.VerifyService, client.DefaultClient)
 	rsp, err := cl.OneClickLogin(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})
@@ -102,7 +102,7 @@ func oneClickLoginHandler(c *gin.Context) {
 func logoutHandler(c *gin.Context) {
 	var req verify.LogoutRequest
 	req.Ip = c.Query("ip")
-	cl := verify.NewVerifyClient(verifyName, client.DefaultClient)
+	cl := verify.NewVerifyClient(accounts.VerifyService, client.DefaultClient)
 	_, err := cl.Logout(context.Background(), &req)
 	if err != nil {
 		c.JSON(http.StatusOK, gin.H{"errno": 1, "desc": err.Error()})

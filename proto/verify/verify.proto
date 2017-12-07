@@ -8,6 +8,7 @@ service Verify {
     rpc PortalLogin(PortalLoginRequest) returns (LoginResponse) {}
     rpc OneClickLogin(OneClickRequest) returns (LoginResponse) {}
     rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+    rpc LogoutAck(LogoutRequest) returns (LogoutResponse) {}
 }
 
 message LogoutRequest {

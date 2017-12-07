@@ -265,6 +265,28 @@ func (s *Server) Logout(ctx context.Context, req *verify.LogoutRequest,
 		log.Printf("logout failed:%+v", err)
 		return err
 	}
+	err = delOnlineRecord(db, req.Ip)
+	if err != nil {
+		log.Printf("logout delete online record failed:%v", err)
+		return err
+	}
+	return nil
+}
+
+func delOnlineRecord(db *sql.DB, userip string) error {
+	_, err := db.Exec("DELETE FROM online_users WHERE userip = ?", userip)
+	return err
+}
+
+//LogoutAck logout ack for ip
+func (s *Server) LogoutAck(ctx context.Context, req *verify.LogoutRequest,
+	rsp *verify.LogoutResponse) error {
+	err := delOnlineRecord(db, req.Ip)
+	if err != nil {
+		log.Printf("logout delete online record failed:%v", err)
+		return err
+	}
+
 	return nil
 }
 
@@ -276,7 +298,7 @@ func main() {
 	}
 
 	service := micro.NewService(
-		micro.Name("go.micro.srv.verify"),
+		micro.Name(accounts.VerifyService),
 		micro.RegisterTTL(30*time.Second),
 		micro.RegisterInterval(10*time.Second),
 	)
